@@ -134,7 +134,7 @@ class Normal:
         p = 0.3275911
 
         t = 1.0 / (1.0 + p * x)
-        y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1)
-        y = y * t * (e ** (-x * x))
+        poly = ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t
+        y = 1.0 - poly * (e ** (-x * x))
 
         return sign * y

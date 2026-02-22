@@ -41,7 +41,7 @@ class Poisson:
 
         # PMF formula: P(X = k) = (λ^k * e^(-λ)) / k!
         e = 2.7182818285
-        
+
         # Calculate k! (factorial)
         factorial = 1
         for i in range(1, k + 1):

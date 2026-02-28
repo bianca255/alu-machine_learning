@@ -38,8 +38,10 @@ def intersection(x, n, P, Pr):
     if not np.isclose(Pr.sum(), 1):
         raise ValueError("Pr must sum to 1")
 
-    from math import factorial
-    binom_coeff = factorial(n) / (factorial(x) * factorial(n - x))
+    log_numer = np.sum(np.log(np.arange(1, n + 1)))
+    log_x = np.sum(np.log(np.arange(1, x + 1)))
+    log_nx = np.sum(np.log(np.arange(1, n - x + 1)))
+    binom_coeff = np.exp(log_numer - log_x - log_nx)
     likelihoods = binom_coeff * (P ** x) * ((1 - P) ** (n - x))
 
     return likelihoods * Pr

@@ -31,9 +31,11 @@ def likelihood(x, n, P):
     if np.any((P < 0) | (P > 1)):
         raise ValueError("All values in P must be in the range [0, 1]")
 
-    # Binomial coefficient: n! / (x! * (n-x)!)
-    from math import factorial
-    binom_coeff = factorial(n) / (factorial(x) * factorial(n - x))
+    # Binomial coefficient using log to avoid overflow: C(n, x)
+    log_numer = np.sum(np.log(np.arange(1, n + 1)))
+    log_x = np.sum(np.log(np.arange(1, x + 1)))
+    log_nx = np.sum(np.log(np.arange(1, n - x + 1)))
+    binom_coeff = np.exp(log_numer - log_x - log_nx)
 
     # Likelihood: C(n,x) * P^x * (1-P)^(n-x)
     likelihoods = binom_coeff * (P ** x) * ((1 - P) ** (n - x))

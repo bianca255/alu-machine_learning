@@ -55,9 +55,8 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
             start_j = j * sw
             # Extract the region and perform element-wise multiplication
             # Sum across height, width, and channels
-            output[:, i, j] = np.sum(
-                padded_images[:, start_i:start_i+kh, start_j:start_j+kw, :] * kernel,
-                axis=(1, 2, 3)
-            )
+            region = padded_images[:, start_i:start_i+kh,
+                                    start_j:start_j+kw, :]
+            output[:, i, j] = np.sum(region * kernel, axis=(1, 2, 3))
 
     return output

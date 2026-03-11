@@ -8,8 +8,10 @@ def pool(images, kernel_shape, stride, mode='max'):
     Performs pooling on images
 
     Args:
-        images: numpy.ndarray with shape (m, h, w, c) containing multiple images
-        kernel_shape: tuple of (kh, kw) containing the kernel shape for pooling
+        images: numpy.ndarray with shape (m, h, w, c) containing multiple
+                images
+        kernel_shape: tuple of (kh, kw) containing the kernel shape for
+                      pooling
         stride: tuple of (sh, sw)
             sh is the stride for the height of the image
             sw is the stride for the width of the image

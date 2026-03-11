@@ -8,7 +8,8 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
     Performs a convolution on images with channels
 
     Args:
-        images: numpy.ndarray with shape (m, h, w, c) containing multiple images
+        images: numpy.ndarray with shape (m, h, w, c) containing
+                multiple images
         kernel: numpy.ndarray with shape (kh, kw, c) containing the kernel
                 for the convolution
         padding: either a tuple of (ph, pw), 'same', or 'valid'
@@ -56,7 +57,7 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
             # Extract the region and perform element-wise multiplication
             # Sum across height, width, and channels
             region = padded_images[:, start_i:start_i+kh,
-                                    start_j:start_j+kw, :]
+                                   start_j:start_j+kw, :]
             output[:, i, j] = np.sum(region * kernel, axis=(1, 2, 3))
 
     return output

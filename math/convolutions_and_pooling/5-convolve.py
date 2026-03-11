@@ -8,9 +8,10 @@ def convolve(images, kernels, padding='same', stride=(1, 1)):
     Performs a convolution on images using multiple kernels
 
     Args:
-        images: numpy.ndarray with shape (m, h, w, c) containing multiple images
-        kernels: numpy.ndarray with shape (kh, kw, c, nc) containing the kernels
-                 for the convolution
+        images: numpy.ndarray with shape (m, h, w, c) containing
+                multiple images
+        kernels: numpy.ndarray with shape (kh, kw, c, nc) containing
+                 the kernels for the convolution
         padding: either a tuple of (ph, pw), 'same', or 'valid'
         stride: tuple of (sh, sw)
             sh is the stride for the height of the image
@@ -57,8 +58,8 @@ def convolve(images, kernels, padding='same', stride=(1, 1)):
                 # Extract the region and perform element-wise multiplication
                 # Sum across height, width, and channels for each kernel
                 region = padded_images[:, start_i:start_i+kh,
-                                        start_j:start_j+kw, :]
+                                       start_j:start_j+kw, :]
                 output[:, i, j, k] = np.sum(region * kernels[:, :, :, k],
-                                             axis=(1, 2, 3))
+                                            axis=(1, 2, 3))
 
     return output

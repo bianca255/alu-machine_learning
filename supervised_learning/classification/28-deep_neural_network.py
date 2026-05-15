@@ -5,8 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
+
 class DeepNeuralNetwork:
-    """A deep neural network performing multiclass classification with selectable activations."""
+    """Deep neural network with multiclass & selectable activations."""
 
     def __init__(self, nx, layers, activation='sig'):
         """
@@ -14,12 +15,12 @@ class DeepNeuralNetwork:
 
         Args:
             nx: Number of input features
-            layers: List representing the number of nodes in each layer
-            activation: Activation function ('sig' for sigmoid, 'tanh' for tanh)
+            layers: List of nodes in each layer
+            activation: Activation function ('sig'/'tanh')
 
         Raises:
-            TypeError: If nx is not an integer or layers is not a list of positive integers
-            ValueError: If nx is less than 1 or layers is empty or activation is invalid
+            TypeError: If nx not int or layers not list
+            ValueError: If nx < 1 or layers empty or invalid activation
         """
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
@@ -44,7 +45,8 @@ class DeepNeuralNetwork:
 
         prev_nodes = nx
         for i in range(1, self.__L + 1):
-            self.__weights[f'W{i}'] = np.random.randn(layers[i-1], prev_nodes) * np.sqrt(2.0 / prev_nodes)
+            w = np.random.randn(layers[i-1], prev_nodes)
+            self.__weights[f'W{i}'] = w * np.sqrt(2.0 / prev_nodes)
             self.__weights[f'b{i}'] = np.zeros((layers[i-1], 1))
             prev_nodes = layers[i-1]
 
@@ -101,8 +103,8 @@ class DeepNeuralNetwork:
         Calculate the cost of the model using cross-entropy loss.
 
         Args:
-            Y: numpy.ndarray with shape (classes, m) containing correct labels (one-hot)
-            A: numpy.ndarray with shape (classes, m) containing activated output
+            Y: numpy.ndarray with shape (classes, m) correct labels
+            A: numpy.ndarray with shape (classes, m) activated output
 
         Returns:
             The cost
@@ -117,7 +119,7 @@ class DeepNeuralNetwork:
 
         Args:
             X: numpy.ndarray with shape (nx, m) containing input data
-            Y: numpy.ndarray with shape (classes, m) containing correct labels (one-hot)
+            Y: numpy.ndarray with shape (classes, m) correct labels
 
         Returns:
             The neuron's prediction and the cost of the network
@@ -157,7 +159,7 @@ class DeepNeuralNetwork:
     def train(self, X, Y, iterations=5000, alpha=0.05,
               verbose=True, graph=True, step=100):
         """
-        Train the deep neural network with optional verbose output and graphing.
+        Train the deep neural network with optional output and graph.
 
         Args:
             X: numpy.ndarray with shape (nx, m) containing input data
@@ -172,9 +174,9 @@ class DeepNeuralNetwork:
             The evaluation of the training data after iterations
 
         Raises:
-            TypeError: If iterations is not an integer, alpha is not a float,
-                       or step is not an integer (when verbose or graph is True)
-            ValueError: If iterations or alpha is not positive, or step is
+            TypeError: If iterations not int, alpha not float,
+                       or step not integer
+            ValueError: If iterations or alpha not positive, or step
                         not positive or greater than iterations
         """
         if not isinstance(iterations, int):

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Mini-batch gradient descent training module."""
-import numpy as np
 import tensorflow as tf
 shuffle_data = __import__('2-shuffle_data').shuffle_data
 

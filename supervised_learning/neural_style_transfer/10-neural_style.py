@@ -161,6 +161,10 @@ class NST:
     @staticmethod
     def variational_cost(generated_image):
         """Calculate total variation in the generated image."""
+        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
+            raise TypeError("generated_image must be a tensor of rank 4")
+        if generated_image.shape.rank != 4:
+            raise TypeError("generated_image must be a tensor of rank 4")
         vertical = tf.square(
             generated_image[:, 1:, :, :] - generated_image[:, :-1, :, :])
         horizontal = tf.square(

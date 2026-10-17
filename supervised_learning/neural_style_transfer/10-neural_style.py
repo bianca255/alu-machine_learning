@@ -134,7 +134,10 @@ class NST:
 
     def total_cost(self, generated_image):
         """Calculate total, content, style, and variation costs."""
-        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
+        valid_tensor = tf.is_tensor(generated_image)
+        if not valid_tensor:
+            valid_tensor = isinstance(generated_image, tf.Variable)
+        if not valid_tensor:
             raise TypeError("generated_image must be a tensor")
         if generated_image.shape != self.content_image.shape:
             raise TypeError("generated_image has the wrong shape")
@@ -149,7 +152,10 @@ class NST:
 
     def compute_grads(self, generated_image):
         """Calculate gradients and the four costs."""
-        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
+        valid_tensor = tf.is_tensor(generated_image)
+        if not valid_tensor:
+            valid_tensor = isinstance(generated_image, tf.Variable)
+        if not valid_tensor:
             raise TypeError("generated_image must be a tensor")
         if generated_image.shape != self.content_image.shape:
             raise TypeError("generated_image has the wrong shape")
@@ -161,14 +167,22 @@ class NST:
     @staticmethod
     def variational_cost(generated_image):
         """Calculate total variation in the generated image."""
-        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
-            raise TypeError("generated_image must be a tensor of rank 4")
-        if generated_image.shape.rank != 4:
-            raise TypeError("generated_image must be a tensor of rank 4")
-        vertical = tf.square(
-            generated_image[:, 1:, :, :] - generated_image[:, :-1, :, :])
-        horizontal = tf.square(
-            generated_image[:, :, 1:, :] - generated_image[:, :, :-1, :])
+        valid_tensor = tf.is_tensor(generated_image)
+        if not valid_tensor:
+            valid_tensor = isinstance(generated_image, tf.Variable)
+        rank = generated_image.shape.ndims if valid_tensor else None
+        if not valid_tensor or rank not in (3, 4):
+            raise TypeError("image must be a tensor of rank 3 or 4")
+        if rank == 4:
+            vertical = (generated_image[:, 1:, :, :] -
+                        generated_image[:, :-1, :, :])
+            horizontal = (generated_image[:, :, 1:, :] -
+                          generated_image[:, :, :-1, :])
+        else:
+            vertical = generated_image[1:, :, :] - generated_image[:-1, :, :]
+            horizontal = generated_image[:, 1:, :] - generated_image[:, :-1, :]
+        vertical = tf.square(vertical)
+        horizontal = tf.square(horizontal)
         return tf.reduce_sum(vertical) + tf.reduce_sum(horizontal)
 
     def variation_cost(self, generated_image):

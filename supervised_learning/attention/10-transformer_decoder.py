@@ -3,8 +3,8 @@
 
 import tensorflow as tf
 
-positional_encoding = __import__("4-positional_encoding").positional_encoding
-DecoderBlock = __import__("8-transformer_decoder_block").DecoderBlock
+positional_encoding = __import__('4-positional_encoding').positional_encoding
+DecoderBlock = __import__('8-transformer_decoder_block').DecoderBlock
 
 
 class Decoder(tf.keras.layers.Layer):
@@ -25,7 +25,7 @@ class Decoder(tf.keras.layers.Layer):
     def call(self, x, encoder_output, training, look_ahead_mask,
              padding_mask):
         """Return the decoded target sequence."""
-        length = tf.shape(x)[1]
+        length = x.shape[1]
         x = self.embedding(x) * tf.math.sqrt(tf.cast(self.dm, tf.float32))
         x += self.positional_encoding[:length]
         x = self.dropout(x, training=training)

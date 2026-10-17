@@ -94,7 +94,7 @@ class NST:
         channels = tf.shape(input_layer)[2]
         features = tf.reshape(input_layer, (height * width, channels))
         gram = tf.matmul(features, features, transpose_a=True)
-        return gram / tf.cast(height * width, tf.float32)
+        return gram[tf.newaxis, ...] / tf.cast(height * width, tf.float32)
 
     def generate_features(self):
         """Generate and store style Gram matrices and content features."""

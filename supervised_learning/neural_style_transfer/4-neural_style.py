@@ -89,13 +89,13 @@ class NST:
         height, width = tf.shape(input_layer)[0], tf.shape(input_layer)[1]
         channels = tf.shape(input_layer)[2]
         features = tf.reshape(input_layer, (height * width, channels))
-        return tf.matmul(features, features, transpose_a=True) / tf.cast(
-            height * width, tf.float32)
+        gram = tf.matmul(features, features, transpose_a=True)
+        return gram[tf.newaxis, ...] / tf.cast(height * width, tf.float32)
 
     def generate_features(self):
         """Generate and store style Gram matrices and content features."""
-        style_outputs = self.load_model()(self.scale_image(self.style_image))
-        content_outputs = self.model(self.scale_image(self.content_image))
+        style_outputs = self.load_model()(self.style_image)
+        content_outputs = self.model(self.content_image)
         self.gram_style_features = [
             self.gram_matrix(output) for output in style_outputs[:-1]
         ]
@@ -103,11 +103,20 @@ class NST:
 
     def layer_style_cost(self, style_output, gram_target):
         """Calculate the cost for one style layer."""
-        if not isinstance(style_output, tf.Tensor):
-            raise TypeError("style_output must be a tensor")
-        if not isinstance(gram_target, tf.Tensor):
-            raise TypeError("gram_target must be a tensor")
+        if tf.is_tensor(style_output):
+            channels = style_output.shape[-1]
+        else:
+            channels = None
+        if not tf.is_tensor(style_output) or style_output.shape.rank != 4:
+            raise TypeError("style_output must be a tensor of rank 4")
+        valid_target = (tf.is_tensor(gram_target) and
+                        gram_target.shape == (1, channels, channels))
+        if not valid_target:
+            raise TypeError(
+                "gram_target must be a tensor of shape [1, {}, {}] where "
+                "{} is the number of channels in style_output".format(
+                    channels, channels, channels))
         gram_style = self.gram_matrix(style_output)
-        channels = tf.cast(tf.shape(gram_style)[0], tf.float32)
+        channels = tf.cast(tf.shape(gram_style)[1], tf.float32)
         return tf.reduce_sum(tf.square(gram_style - gram_target)) / (
             4.0 * tf.square(channels))

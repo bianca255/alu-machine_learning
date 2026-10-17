@@ -92,4 +92,5 @@ class NST:
         features = tf.reshape(
             input_layer, (shape[0] * shape[1], shape[2]))
         gram = tf.matmul(features, features, transpose_a=True)
-        return gram / tf.cast(shape[0] * shape[1], tf.float32)
+        return gram[tf.newaxis, ...] / tf.cast(
+            shape[0] * shape[1], tf.float32)

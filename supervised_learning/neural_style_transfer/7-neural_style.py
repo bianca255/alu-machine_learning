@@ -86,8 +86,8 @@ class NST:
         height, width = tf.shape(input_layer)[:2]
         channels = tf.shape(input_layer)[2]
         features = tf.reshape(input_layer, (height * width, channels))
-        return tf.matmul(features, features, transpose_a=True) / tf.cast(
-            height * width, tf.float32)
+        gram = tf.matmul(features, features, transpose_a=True)
+        return gram[tf.newaxis, ...] / tf.cast(height * width, tf.float32)
 
     def generate_features(self):
         """Generate and store style Gram matrices and content features."""
@@ -100,14 +100,15 @@ class NST:
     def layer_style_cost(self, style_output, gram_target):
         """Calculate the cost for one style layer."""
         gram_style = self.gram_matrix(style_output)
-        channels = tf.cast(tf.shape(gram_style)[0], tf.float32)
+        channels = tf.cast(tf.shape(gram_style)[1], tf.float32)
         return tf.reduce_sum(tf.square(gram_style - gram_target)) / (
             4.0 * tf.square(channels))
 
     def style_cost(self, style_outputs):
         """Calculate the total style cost for all five style layers."""
         if not isinstance(style_outputs, list) or len(style_outputs) != 5:
-            raise TypeError("style_outputs must be a list of length 5")
+            raise TypeError(
+                "style_outputs must be a list with a length of 5")
         if self.gram_style_features is None:
             self.generate_features()
         return tf.add_n([self.layer_style_cost(output, target)
@@ -117,19 +118,27 @@ class NST:
     def content_cost(self, content_output):
         """Calculate the content cost for a generated feature map."""
         if not tf.is_tensor(content_output):
-            raise TypeError("content_output must be a tensor")
+            raise TypeError(
+                "content_output must be a tensor of shape {}".format(
+                    self.content_feature.shape))
         if self.content_feature is None:
             self.generate_features()
         if content_output.shape != self.content_feature.shape:
-            raise TypeError("content_output has the wrong shape")
+            raise TypeError(
+                "content_output must be a tensor of shape {}".format(
+                    self.content_feature.shape))
         return tf.reduce_sum(tf.square(self.content_feature - content_output))
 
     def total_cost(self, generated_image):
         """Calculate total, content, and style costs."""
         if not isinstance(generated_image, tf.Tensor):
-            raise TypeError("generated_image must be a tensor")
+            raise TypeError(
+                "generated_image must be a tensor of shape {}".format(
+                    self.content_image.shape))
         if generated_image.shape != self.content_image.shape:
-            raise TypeError("generated_image has the wrong shape")
+            raise TypeError(
+                "generated_image must be a tensor of shape {}".format(
+                    self.content_image.shape))
         if self.model is None or self.gram_style_features is None:
             self.generate_features()
         outputs = self.model(generated_image)

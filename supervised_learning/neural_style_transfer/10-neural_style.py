@@ -134,7 +134,7 @@ class NST:
 
     def total_cost(self, generated_image):
         """Calculate total, content, style, and variation costs."""
-        if not isinstance(generated_image, tf.Tensor):
+        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
             raise TypeError("generated_image must be a tensor")
         if generated_image.shape != self.content_image.shape:
             raise TypeError("generated_image has the wrong shape")
@@ -149,7 +149,7 @@ class NST:
 
     def compute_grads(self, generated_image):
         """Calculate gradients and the four costs."""
-        if not isinstance(generated_image, tf.Tensor):
+        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
             raise TypeError("generated_image must be a tensor")
         if generated_image.shape != self.content_image.shape:
             raise TypeError("generated_image has the wrong shape")

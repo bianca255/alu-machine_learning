@@ -29,6 +29,7 @@ class NST:
         self.model = None
         self.gram_style_features = None
         self.content_feature = None
+        self.generate_features()
 
     @staticmethod
     def _validate_image(image, name):
@@ -165,7 +166,7 @@ class NST:
         """Generate the lowest-cost image using Adam."""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
-        if iterations <= 0:
+        if iterations < 1:
             raise ValueError("iterations must be positive")
         if step is not None and not isinstance(step, int):
             raise TypeError("step must be an integer")
@@ -190,14 +191,14 @@ class NST:
         best_image, best_cost = None, float('inf')
         for iteration in range(iterations):
             gradients, total, content, style = self.compute_grads(generated)
-            if (iteration == 0 or (step and iteration % step == 0) or
+            if (iteration == 0 or iteration % step == 0 or
                     iteration == iterations - 1):
                 print(
                     "Cost at iteration {}: {}, content {}, style {}".format(
                         iteration, total, content, style))
-            optimizer.apply_gradients([(gradients, generated)])
-            generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
             cost = float(total.numpy())
             if cost < best_cost:
                 best_cost, best_image = cost, generated.numpy().copy()
+            optimizer.apply_gradients([(gradients, generated)])
+            generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
         return best_image, best_cost

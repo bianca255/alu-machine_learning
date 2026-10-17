@@ -81,3 +81,15 @@ class NST:
         model.trainable = False
         self.model = model
         return model
+
+    @staticmethod
+    def gram_matrix(input_layer):
+        """Calculate a normalized Gram matrix from a rank-four tensor."""
+        if not tf.is_tensor(input_layer) or input_layer.shape.rank != 4:
+            raise TypeError("input_layer must be a tensor of rank 4")
+        input_layer = input_layer[0]
+        shape = tf.shape(input_layer)
+        features = tf.reshape(
+            input_layer, (shape[0] * shape[1], shape[2]))
+        gram = tf.matmul(features, features, transpose_a=True)
+        return gram / tf.cast(shape[0] * shape[1], tf.float32)

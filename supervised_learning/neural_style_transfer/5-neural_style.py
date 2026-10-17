@@ -36,6 +36,7 @@ class NST:
         self.model = None
         self.gram_style_features = None
         self.content_feature = None
+        self.generate_features()
 
     @staticmethod
     def scale_image(image):
@@ -106,10 +107,7 @@ class NST:
 
     def style_cost(self, style_outputs):
         """Calculate the total style cost for all five style layers."""
-        if not isinstance(
-                style_outputs,
-                list) or len(style_outputs) != len(
-                self.style_layers):
+        if not isinstance(style_outputs, list) or len(style_outputs) != 5:
             raise TypeError("style_outputs must be a list of length 5")
         if self.gram_style_features is None:
             self.generate_features()

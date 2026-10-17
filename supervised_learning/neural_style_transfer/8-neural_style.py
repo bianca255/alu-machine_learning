@@ -39,6 +39,7 @@ class NST:
         self.model = None
         self.gram_style_features = None
         self.content_feature = None
+        self.generate_features()
 
     @staticmethod
     def scale_image(image):
@@ -142,7 +143,7 @@ class NST:
 
     def compute_grads(self, generated_image):
         """Calculate gradients and the three costs."""
-        if not isinstance(generated_image, tf.Tensor):
+        if not tf.is_tensor(generated_image):
             raise TypeError("generated_image must be a tensor")
         if generated_image.shape != self.content_image.shape:
             raise TypeError("generated_image has the wrong shape")

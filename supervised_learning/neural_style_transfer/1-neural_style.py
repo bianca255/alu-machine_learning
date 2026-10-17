@@ -56,3 +56,25 @@ class NST:
             method='bicubic'
         )
         return scaled[tf.newaxis, ...] / 255.0
+
+    def load_model(self):
+        """Load VGG19 with average pooling and selected layer outputs."""
+        original = tf.keras.applications.VGG19(
+            include_top=False, weights='imagenet')
+
+        def replace_pooling(layer):
+            if isinstance(layer, tf.keras.layers.MaxPooling2D):
+                return tf.keras.layers.AveragePooling2D(
+                    pool_size=layer.pool_size, strides=layer.strides,
+                    padding=layer.padding, name=layer.name)
+            return layer
+
+        model = tf.keras.models.clone_model(
+            original, clone_function=replace_pooling)
+        model.set_weights(original.get_weights())
+        outputs = [model.get_layer(name).output for name in self.style_layers]
+        outputs.append(model.get_layer(self.content_layer).output)
+        model = tf.keras.Model(model.input, outputs)
+        model.trainable = False
+        self.model = model
+        return model

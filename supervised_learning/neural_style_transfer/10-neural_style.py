@@ -32,6 +32,7 @@ class NST:
         self.model = None
         self.gram_style_features = None
         self.content_feature = None
+        self.generate_features()
 
     @staticmethod
     def _validate_image(image, name):
@@ -172,7 +173,8 @@ class NST:
             valid_tensor = isinstance(generated_image, tf.Variable)
         rank = generated_image.shape.ndims if valid_tensor else None
         if not valid_tensor or rank not in (3, 4):
-            raise TypeError("image must be a tensor of rank 3 or 4")
+            raise TypeError(
+                "generated_image must be a tensor of rank 3 or 4")
         if rank == 4:
             vertical = (generated_image[:, 1:, :, :] -
                         generated_image[:, :-1, :, :])
@@ -194,7 +196,7 @@ class NST:
         """Generate the lowest-cost image using Adam."""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
-        if iterations <= 0:
+        if iterations < 1:
             raise ValueError("iterations must be positive")
         if step is not None and not isinstance(step, int):
             raise TypeError("step must be an integer")
@@ -220,15 +222,15 @@ class NST:
         for iteration in range(iterations):
             gradients, total, content, style, J_var = self.compute_grads(
                 generated)
-            if (iteration == 0 or (step and iteration % step == 0) or
+            if (iteration == 0 or iteration % step == 0 or
                     iteration == iterations - 1):
                 print(
                     "Cost at iteration {}: {}, content {}, style {}, "
                     "var {}".format(
                         iteration, total, content, style, J_var))
-            optimizer.apply_gradients([(gradients, generated)])
-            generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
             cost = float(total.numpy())
             if cost < best_cost:
                 best_cost, best_image = cost, generated.numpy().copy()
+            optimizer.apply_gradients([(gradients, generated)])
+            generated.assign(tf.clip_by_value(generated, 0.0, 1.0))
         return best_image, best_cost

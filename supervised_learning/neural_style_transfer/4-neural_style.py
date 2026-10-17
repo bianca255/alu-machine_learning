@@ -38,6 +38,7 @@ class NST:
         self.model = None
         self.gram_style_features = None
         self.content_feature = None
+        self.generate_features()
 
     @staticmethod
     def scale_image(image):
@@ -102,9 +103,9 @@ class NST:
 
     def layer_style_cost(self, style_output, gram_target):
         """Calculate the cost for one style layer."""
-        if not tf.is_tensor(style_output):
+        if not isinstance(style_output, tf.Tensor):
             raise TypeError("style_output must be a tensor")
-        if not tf.is_tensor(gram_target):
+        if not isinstance(gram_target, tf.Tensor):
             raise TypeError("gram_target must be a tensor")
         gram_style = self.gram_matrix(style_output)
         channels = tf.cast(tf.shape(gram_style)[0], tf.float32)

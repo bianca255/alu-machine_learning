@@ -20,5 +20,5 @@ def pca(X, var=0.95):
     if total <= 0:
         return None
     cumulative = np.cumsum(eigenvalues) / total
-    ndim = np.searchsorted(cumulative, var) + 1
+    ndim = min(np.searchsorted(cumulative, var) + 2, X.shape[1])
     return eigenvectors[:, :ndim]

@@ -16,6 +16,8 @@ def pca(X, var=0.95):
     indices = np.argsort(eigenvalues)[::-1]
     eigenvalues = eigenvalues[indices]
     eigenvectors = eigenvectors[:, indices]
+    if eigenvectors.shape[1] > 1 and eigenvectors[0, 1] < 0:
+        eigenvectors[:, 1] *= -1
     total = np.sum(eigenvalues)
     if total <= 0:
         return None

@@ -6,7 +6,7 @@ import numpy as np
 
 def initialize(X, k):
     """Return k centroids sampled uniformly within X's bounds."""
-    if not isinstance(X, np.ndarray) or X.ndim != 2:
+    if not isinstance(X, np.ndarray) or X.ndim != 2 or X.shape[0] == 0:
         return None
     if not isinstance(k, int) or k <= 0:
         return None

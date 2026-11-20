@@ -23,11 +23,11 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         return None, None, None, None
     n, d = X.shape
 
-    if not isinstance(kmin, int) or kmin <= 0 or kmin > n:
+    if not isinstance(kmin, int) or kmin <= 0 or kmin >= n:
         return None, None, None, None
     if kmax is None:
-        kmax = n
-    if not isinstance(kmax, int) or kmax <= 0 or kmax > n:
+        kmax = n - 1
+    if not isinstance(kmax, int) or kmax <= 0 or kmax >= n:
         return None, None, None, None
     if kmax < kmin:
         return None, None, None, None

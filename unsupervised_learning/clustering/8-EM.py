@@ -11,6 +11,8 @@ maximization = __import__('7-maximization').maximization
 def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     """Fit a Gaussian mixture model with EM."""
     if (not isinstance(X, np.ndarray) or X.ndim != 2 or X.shape[0] == 0
+            or X.shape[1] == 0 or not np.issubdtype(X.dtype, np.number)
+            or not np.all(np.isfinite(X))
             or type(k) is not int or k <= 0 or k > X.shape[0]
             or type(iterations) is not int or iterations <= 0
             or type(tol) is not float or tol < 0
